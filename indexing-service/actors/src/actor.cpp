@@ -1,7 +1,10 @@
-#include "actor.h"
+#include <actor.h>
+#include "actorthread.h"
 
 Actor::Actor(Actor* parent) : QObject(parent)
 {
+    thread_ = new ActorThread(this);
+    thread_->start();
 }
 
 bool Actor::delivery_from(Actor *sender /*, const Message& msg */)
@@ -22,3 +25,12 @@ bool Actor::reply(/* const Message& msg */)
     }
     return false;
 }
+
+bool Actor::processMessage()
+{
+//    auto message = mailbox_->pop();
+//    TODO: hacer algo con el mensaje
+
+}
+
+Actor::~Actor() {}

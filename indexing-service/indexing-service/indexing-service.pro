@@ -26,5 +26,5 @@ win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../actors/release/ -la
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../actors/debug/ -lactors
 else:unix: LIBS += -L$$OUT_PWD/../actors/ -lactors
 
-INCLUDEPATH += $$PWD/../actors
+INCLUDEPATH += $$PWD/../actors/include
 DEPENDPATH += $$PWD/../actors

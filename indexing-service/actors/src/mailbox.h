@@ -41,7 +41,7 @@ template<typename Message>
 void MailBox<Message>::push(Message &&msg)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    mailbox_.push(msg);
+    mailbox_.push(std::move(msg));
     mailboxNoEmpty_.notify_one();
 }
 
