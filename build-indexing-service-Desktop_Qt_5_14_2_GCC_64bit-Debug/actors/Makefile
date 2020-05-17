@@ -16,7 +16,7 @@ CC            = gcc
 CXX           = g++
 DEFINES       = -DACTORS_LIBRARY -DQT_DEPRECATED_WARNINGS -DQT_QML_DEBUG -DQT_CORE_LIB
 CFLAGS        = -pipe -g -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
-CXXFLAGS      = -pipe -g -std=gnu++11 -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
+CXXFLAGS      = -pipe -g -std=gnu++1z -Wall -Wextra -D_REENTRANT -fPIC $(DEFINES)
 INCPATH       = -I../../indexing-service/actors -I. -I/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include -I/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore -I. -I/home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/linux-g++
 QMAKE         = /home/angel/Programas/Qt5.14/5.14.2/gcc_64/bin/qmake
 DEL_FILE      = rm -f
@@ -52,8 +52,13 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = ../../indexing-service/actors/actor.cpp 
-OBJECTS       = actor.o
+SOURCES       = ../../indexing-service/actors/actor.cpp \
+		../../indexing-service/actors/actorthread.cpp moc_actor.cpp \
+		moc_actorthread.cpp
+OBJECTS       = actor.o \
+		actorthread.o \
+		moc_actor.o \
+		moc_actorthread.o
 DIST          = /home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/features/spec_pre.prf \
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/common/unix.conf \
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/common/linux.conf \
@@ -264,7 +269,10 @@ DIST          = /home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/features/spec
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/features/yacc.prf \
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/features/lex.prf \
 		../../indexing-service/actors/actors.pro ../../indexing-service/actors/actors_global.h \
-		../../indexing-service/actors/actor.h ../../indexing-service/actors/actor.cpp
+		../../indexing-service/actors/actor.h \
+		../../indexing-service/actors/actorthread.h \
+		../../indexing-service/actors/mailbox.h ../../indexing-service/actors/actor.cpp \
+		../../indexing-service/actors/actorthread.cpp
 QMAKE_TARGET  = actors
 DESTDIR       = 
 TARGET        = libactors.so.1.0.0
@@ -729,8 +737,8 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents /home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../indexing-service/actors/actors_global.h ../../indexing-service/actors/actor.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../indexing-service/actors/actor.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../indexing-service/actors/actors_global.h ../../indexing-service/actors/actor.h ../../indexing-service/actors/actorthread.h ../../indexing-service/actors/mailbox.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../indexing-service/actors/actor.cpp ../../indexing-service/actors/actorthread.cpp $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -760,26 +768,16 @@ compiler_moc_predefs_make_all: moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) moc_predefs.h
 moc_predefs.h: /home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/features/data/dummy.cpp
-	g++ -pipe -g -std=gnu++11 -Wall -Wextra -dM -E -o moc_predefs.h /home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/features/data/dummy.cpp
+	g++ -pipe -g -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all:
+compiler_moc_header_make_all: moc_actor.cpp moc_actorthread.cpp
 compiler_moc_header_clean:
-compiler_moc_objc_header_make_all:
-compiler_moc_objc_header_clean:
-compiler_moc_source_make_all:
-compiler_moc_source_clean:
-compiler_yacc_decl_make_all:
-compiler_yacc_decl_clean:
-compiler_yacc_impl_make_all:
-compiler_yacc_impl_clean:
-compiler_lex_make_all:
-compiler_lex_clean:
-compiler_clean: compiler_moc_predefs_clean 
-
-####### Compile
-
-actor.o: ../../indexing-service/actors/actor.cpp ../../indexing-service/actors/actor.h \
-		../../indexing-service/actors/actors_global.h \
+	-$(DEL_FILE) moc_actor.cpp moc_actorthread.cpp
+moc_actor.cpp: ../../indexing-service/actors/actor.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/QObject \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobject.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qnamespace.h \
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qglobal.h \
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qconfig-bootstrapped.h \
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qconfig.h \
@@ -800,8 +798,243 @@ actor.o: ../../indexing-service/actors/actor.cpp ../../indexing-service/actors/a
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qglobalstatic.h \
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qmutex.h \
 		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qnumeric.h \
-		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qversiontagging.h
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qversiontagging.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstring.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qchar.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbytearray.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qrefcount.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qarraydata.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringliteral.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringalgorithms.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringview.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qlist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qalgorithms.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qiterator.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qhashfunctions.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qpair.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qvector.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcontainertools_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qpoint.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringlist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qregexp.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcoreevent.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qmetatype.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobject_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/QThread \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qthread.h \
+		../../indexing-service/actors/actors_global.h \
+		moc_predefs.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/bin/moc
+	/home/angel/Programas/Qt5.14/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/angel/Workspace/SOA/Indexing-Service/build-indexing-service-Desktop_Qt_5_14_2_GCC_64bit-Debug/actors/moc_predefs.h -I/home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/angel/Workspace/SOA/Indexing-Service/indexing-service/actors -I/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include -I/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../indexing-service/actors/actor.h -o moc_actor.cpp
+
+moc_actorthread.cpp: ../../indexing-service/actors/actorthread.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/QThread \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qthread.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobject.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qnamespace.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qglobal.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qconfig.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qtcore-config.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qsystemdetection.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qprocessordetection.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcompilerdetection.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qtypeinfo.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qsysinfo.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qlogging.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qflags.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbasicatomic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qgenericatomic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic_msvc.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qglobalstatic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qmutex.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qnumeric.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qversiontagging.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstring.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qchar.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbytearray.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qrefcount.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qarraydata.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringliteral.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringalgorithms.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringview.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qlist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qalgorithms.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qiterator.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qhashfunctions.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qpair.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qvector.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcontainertools_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qpoint.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringlist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qregexp.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcoreevent.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qmetatype.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobject_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/QObject \
+		../../indexing-service/actors/actor.h \
+		../../indexing-service/actors/actors_global.h \
+		moc_predefs.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/bin/moc
+	/home/angel/Programas/Qt5.14/5.14.2/gcc_64/bin/moc $(DEFINES) --include /home/angel/Workspace/SOA/Indexing-Service/build-indexing-service-Desktop_Qt_5_14_2_GCC_64bit-Debug/actors/moc_predefs.h -I/home/angel/Programas/Qt5.14/5.14.2/gcc_64/mkspecs/linux-g++ -I/home/angel/Workspace/SOA/Indexing-Service/indexing-service/actors -I/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include -I/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore -I. -I/usr/include/c++/9 -I/usr/include/x86_64-linux-gnu/c++/9 -I/usr/include/c++/9/backward -I/usr/lib/gcc/x86_64-linux-gnu/9/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../../indexing-service/actors/actorthread.h -o moc_actorthread.cpp
+
+compiler_moc_objc_header_make_all:
+compiler_moc_objc_header_clean:
+compiler_moc_source_make_all:
+compiler_moc_source_clean:
+compiler_yacc_decl_make_all:
+compiler_yacc_decl_clean:
+compiler_yacc_impl_make_all:
+compiler_yacc_impl_clean:
+compiler_lex_make_all:
+compiler_lex_clean:
+compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean 
+
+####### Compile
+
+actor.o: ../../indexing-service/actors/actor.cpp ../../indexing-service/actors/actor.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/QObject \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobject.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qnamespace.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qglobal.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qconfig.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qtcore-config.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qsystemdetection.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qprocessordetection.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcompilerdetection.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qtypeinfo.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qsysinfo.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qlogging.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qflags.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbasicatomic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qgenericatomic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic_msvc.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qglobalstatic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qmutex.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qnumeric.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qversiontagging.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstring.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qchar.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbytearray.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qrefcount.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qarraydata.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringliteral.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringalgorithms.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringview.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qlist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qalgorithms.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qiterator.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qhashfunctions.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qpair.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qvector.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcontainertools_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qpoint.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringlist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qregexp.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcoreevent.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qmetatype.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobject_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/QThread \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qthread.h \
+		../../indexing-service/actors/actors_global.h \
+		../../indexing-service/actors/actorthread.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o actor.o ../../indexing-service/actors/actor.cpp
+
+actorthread.o: ../../indexing-service/actors/actorthread.cpp ../../indexing-service/actors/actorthread.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/QThread \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qthread.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobject.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobjectdefs.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qnamespace.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qglobal.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qconfig-bootstrapped.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qconfig.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qtcore-config.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qsystemdetection.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qprocessordetection.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcompilerdetection.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qtypeinfo.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qsysinfo.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qlogging.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qflags.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbasicatomic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic_bootstrap.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qgenericatomic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic_cxx11.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qatomic_msvc.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qglobalstatic.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qmutex.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qnumeric.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qversiontagging.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobjectdefs_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstring.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qchar.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbytearray.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qrefcount.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qarraydata.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringliteral.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringalgorithms.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringview.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringbuilder.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qlist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qalgorithms.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qiterator.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qhashfunctions.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qpair.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qvector.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcontainertools_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qpoint.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qbytearraylist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringlist.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qregexp.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qstringmatcher.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcoreevent.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qscopedpointer.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qmetatype.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qvarlengtharray.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qcontainerfwd.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/qobject_impl.h \
+		/home/angel/Programas/Qt5.14/5.14.2/gcc_64/include/QtCore/QObject \
+		../../indexing-service/actors/actor.h \
+		../../indexing-service/actors/actors_global.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o actorthread.o ../../indexing-service/actors/actorthread.cpp
+
+moc_actor.o: moc_actor.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_actor.o moc_actor.cpp
+
+moc_actorthread.o: moc_actorthread.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_actorthread.o moc_actorthread.cpp
 
 ####### Install
 
