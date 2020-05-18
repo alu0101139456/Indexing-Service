@@ -6,7 +6,7 @@
 
 Actor::Actor(Actor* parent) : QObject(parent)
 {
-    mailbox_ = std::make_unique<ActorMailbox>();
+    mailbox_ = std::make_unique<ActorMailBox>();
     thread_ = new ActorThread(this);
     thread_->start();
 }
@@ -18,7 +18,7 @@ bool Actor::delivery_from(Actor *sender, const QString& message, const QVariant&
                           const QVariant& arg4, const QVariant& arg5, const QVariant& arg6,
                           const QVariant& arg7, const QVariant& arg8, const QVariant& arg9)
 {
-    auto f = [this, sender, message, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]() {
+    mailbox_->push([this, sender, message, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9]() {
         sender_ = sender;
         bool success = QMetaObject::invokeMethod(this, message.toLocal8Bit(), Qt::DirectConnection,
                                                   QGenericArgument(arg0.typeName(), arg0.data()),
@@ -32,9 +32,8 @@ bool Actor::delivery_from(Actor *sender, const QString& message, const QVariant&
                                                   QGenericArgument(arg8.typeName(), arg8.data()),
                                                   QGenericArgument(arg9.typeName(), arg9.data()));
         sender_ = nullptr;
-    };
+    });
 
-//    mailbox_->push(f);
     return true;
 }
 

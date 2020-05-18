@@ -12,7 +12,7 @@
 class ActorThread;
 
 template <typename Message>
-class Mailbox;
+class MailBox;
 
 class ACTORS_EXPORT Actor : public QObject
 {
@@ -20,7 +20,7 @@ class ACTORS_EXPORT Actor : public QObject
 
 public:
     using ActorMessage = std::function<void ()>;
-    using ActorMailbox = Mailbox<ActorMessage>;
+    using ActorMailBox = MailBox<ActorMessage>;
 
     explicit Actor(Actor* parent);
     ~Actor();
@@ -47,7 +47,7 @@ private:
     Actor* sender_ = nullptr;
     ActorThread*  thread_;
 
-    std::unique_ptr<ActorMailbox> mailbox_;
+    std::unique_ptr<ActorMailBox> mailbox_;
 
     friend ActorThread;
 

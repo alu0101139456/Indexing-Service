@@ -7,6 +7,7 @@
 
 template <typename Message>
 class MailBox
+
 {
 private:
 
