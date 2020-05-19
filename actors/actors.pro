@@ -19,11 +19,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH += include/
 SOURCES += \
     src/actor.cpp \
+    src/actormanager.cpp \
     src/actorthread.cpp
 
 HEADERS += \
     include/actors_global.h \
     include/actor.h \
+    include/actormanager.h \
     src/actorthread.h \
     src/mailbox.h
 

@@ -14,3 +14,6 @@ else:unix: LIBS += -L$$OUT_PWD/../actors/ -lactors
 
 INCLUDEPATH += $$PWD/../actors/include
 DEPENDPATH += $$PWD/../actors/include
+
+HEADERS += \
+    testactor.h

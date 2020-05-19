@@ -1,3 +1,4 @@
+#include <actormanager.h>
 #include <actor.h>
 #include "actorthread.h"
 #include "mailbox.h"
