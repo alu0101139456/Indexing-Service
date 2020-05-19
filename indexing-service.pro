@@ -2,5 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
   actors \
-  indexing-service
+  indexing-service \
+  test
 
+test.depends = actors
