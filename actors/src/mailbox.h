@@ -55,6 +55,7 @@ Message MailBox<Message>::pop()
     }
     auto message = std::move(mailbox_.front());
     mailbox_.pop();
+    return message;
 }
 
 template<typename Message>
