@@ -6,7 +6,7 @@
 class TestActor : public Actor
 {
     Q_OBJECT
-    Q_PROPERTY(int intProperty MEMBER int property_);
+    Q_PROPERTY(int intProperty MEMBER intProperty_);
 
 public:
     TestActor(Actor* parent) : Actor(parent) {}
@@ -16,7 +16,7 @@ public:
     }
 
 public Q_SLOTS:
-    void updateIntProperty (int arg) {
+    void updateIntProperty(int arg) {
         intProperty_ = arg;
     }
 
