@@ -26,13 +26,10 @@ public:
 
     ~Actor();
 
-    bool delivery_from (Actor* sender , const QString& message, const QVariant& arg0 = QVariant(),
-                        const QVariant& arg1 = QVariant(), const QVariant& arg2 = QVariant(), const QVariant& arg3 = QVariant(),
-                        const QVariant& arg4 = QVariant(), const QVariant& arg5 = QVariant(), const QVariant& arg6 = QVariant(),
-                        const QVariant& arg7 = QVariant(), const QVariant& arg8 = QVariant(), const QVariant& arg9 = QVariant());
 
 protected:
 
+    Actor* sender() { return sender_; }
     explicit Actor(Actor* parent);
 
     bool send (Actor* receiver, const QString& message, const QVariant& arg0 = QVariant(),
@@ -45,8 +42,15 @@ protected:
                const QVariant& arg4 = QVariant(), const QVariant& arg5 = QVariant(), const QVariant& arg6 = QVariant(),
                const QVariant& arg7 = QVariant(), const QVariant& arg8 = QVariant(), const QVariant& arg9 = QVariant());
 
+    bool delivery_from (Actor* sender , const QString& message, const QVariant& arg0 = QVariant(),
+                        const QVariant& arg1 = QVariant(), const QVariant& arg2 = QVariant(), const QVariant& arg3 = QVariant(),
+                        const QVariant& arg4 = QVariant(), const QVariant& arg5 = QVariant(), const QVariant& arg6 = QVariant(),
+                        const QVariant& arg7 = QVariant(), const QVariant& arg8 = QVariant(), const QVariant& arg9 = QVariant());
+
     template <typename ActorClass>
     ActorClass* spawn();
+
+//    void kill();
 
 private:
 
@@ -55,10 +59,10 @@ private:
 
     std::unique_ptr<ActorMailBox> mailbox_;
 
+    bool processMessage();
+
     friend ActorThread;
     friend ActorManager;
-
-    bool processMessage();
 };
 
 template <typename ActorClass>
