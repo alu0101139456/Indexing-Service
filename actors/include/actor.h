@@ -50,9 +50,11 @@ protected:
     template <typename ActorClass>
     ActorClass* spawn();
 
-//    void kill();
+    void kill();
 
 private:
+
+    bool done_;
 
     Actor* sender_ = nullptr;
     ActorThread*  thread_;

@@ -17,6 +17,8 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
     void slotIsCalledWhenMessageIsSend();
+    void actorKillItSelfWhenIsRequest();
+    void actorIsNotifiedWhenChildFails();
     /* TODO:                                            CREAR CLASES TESTEO POR CLASES A TESTEAR
     void senderIsNullWhenNoMessage();
     void senderIsSetWhenMessageArrives();
@@ -26,9 +28,8 @@ private slots:
     void slotIsCalledWhenUnkownMessage();
 
     Actor::kill(); ActorManager::kill(Actor* actor);
-    void actorKillItSelfWhenIsRequest();
 
-    void actorIsNotifiedWhenChildFailds();
+
 
     OPCIONAL --> Testing del ActorManager
     */
@@ -52,14 +53,19 @@ actortest::~actortest()
 
 void actortest::initTestCase()
 {
+    ActorManager::makeActorManager(this);
     actorA_ = ActorManager::instance()->spawn<TestActor>();
     actorB_ = ActorManager::instance()->spawn<TestActor>();
 }
 
 void actortest::cleanupTestCase()
 {
-    // ActorManager::kill(actorA_);
-    // ActorManager::kill(actorB_);
+    QPointer<TestActor> p = actorA_;
+
+    ActorManager::instance()->kill(actorA_);
+    ActorManager::instance()->kill(actorB_);
+
+    while(!p.isNull());
 }
 
 void actortest::slotIsCalledWhenMessageIsSend()
@@ -69,6 +75,25 @@ void actortest::slotIsCalledWhenMessageIsSend()
     QTest::qWait(100); //hay que tener siempre en cuenta el tiempo porque son hilos y estan vivos
     QVERIFY(actorB_->property("intProperty").canConvert<int>());
     QCOMPARE(actorB_->property("intProperty").toInt(), arg);
+}
+
+void actortest::actorKillItSelfWhenIsRequest() {
+    QPointer<TestActor> actor = ActorManager::instance()->spawn<TestActor>();
+
+    QVERIFY(actor->testSend(actor, "die"));
+    QTest::qWait(100);
+    QVERIFY(actor.isNull());
+}
+
+void actortest::actorIsNotifiedWhenChildFails()
+{
+    auto child = actorA_->spawnChildAndFail();
+    auto cleanup = qScopeGuard([child]() {
+        ActorManager::instance()->kill(child);
+    });
+    // Comprobar si actorA_ recibio el mensaje de fail del hijo
+
+// <<--- se destruye cleanup
 }
 
 QTEST_MAIN(actortest)

@@ -3,16 +3,22 @@
 #include "actorthread.h"
 #include "mailbox.h"
 
+#include <QDebug>
 
 
-Actor::Actor(Actor* parent) : QObject(parent)
+Actor::Actor(Actor* parent)
+    : QObject(parent), done_(false)
 {
     mailbox_ = std::make_unique<ActorMailBox>();
     thread_ = new ActorThread(this);
     thread_->start();
 }
 
-Actor::~Actor() = default; //para que el mailbox pueda ser opcaco
+Actor::~Actor() { //para que el mailbox pueda ser opcaco
+    if (!thread_->isFinished()) {
+        qCritical() << "Se ha intentado destruir un actor no detenido: " << this;
+    }
+}
 
 bool Actor::delivery_from(Actor *sender, const QString& message, const QVariant& arg0,
                           const QVariant& arg1, const QVariant& arg2, const QVariant& arg3,
@@ -38,6 +44,11 @@ bool Actor::delivery_from(Actor *sender, const QString& message, const QVariant&
     return true;
 }
 
+void Actor::kill()
+{
+    done_ = true;
+}
+
 bool Actor::send(Actor *receiver, const QString& message, const QVariant& arg0,
                  const QVariant& arg1, const QVariant& arg2, const QVariant& arg3,
                  const QVariant& arg4, const QVariant& arg5, const QVariant& arg6,
@@ -61,7 +72,7 @@ bool Actor::processMessage()
 {
     auto message = mailbox_->pop();
     message();
-    return true;
+    return !done_;
 }
 
 

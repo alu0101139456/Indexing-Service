@@ -9,4 +9,5 @@ ActorThread::ActorThread(Actor* actor)
 void ActorThread::run()
 {
     while (actor_->processMessage());
+    actor_->deleteLater();
 }

@@ -9,14 +9,29 @@ ActorManager::ActorManager(QObject *parent)
 
 }
 
-ActorManager::~ActorManager() = default;
+ActorManager::~ActorManager() {
+    kill(rootActor_.data());
+}
+
+ActorManager *ActorManager::makeActorManager(QObject *parent)
+{
+    if (!instance_) {
+        instance_ = new ActorManager(parent);
+    }
+    return instance_;
+}
 
 ActorManager *ActorManager::instance()
 {
     if (!instance_) {
-        instance_ = new ActorManager();
+        qFatal("Se intenta usar el ActorManager sin inicializarlo.");
     }
     return instance_;
+}
+
+void ActorManager::kill(Actor *actor)
+{
+    actor->done_ = true;
 }
 
 bool ActorManager::send(Actor *receiver, const QString &message, const QVariant &arg0,

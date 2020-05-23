@@ -12,13 +12,14 @@ class ACTORS_EXPORT ActorManager : public QObject
     Q_OBJECT
 public:
 
+    static ActorManager* makeActorManager (QObject* parent = nullptr);
     static ActorManager* instance();
     ~ActorManager();
 
     template <typename ActorClass>
     ActorClass* spawn (Actor* parent = nullptr);
 
-//    void kill (Actor* actor);
+    void kill (Actor* actor);
 
     bool send (Actor* receiver, const QString& message, const QVariant& arg0 = QVariant(),
                const QVariant& arg1 = QVariant(), const QVariant& arg2 = QVariant(), const QVariant& arg3 = QVariant(),
