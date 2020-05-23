@@ -59,10 +59,9 @@ bool Actor::reply(const QString& message, const QVariant& arg0,
 
 bool Actor::processMessage()
 {
-//    auto message = mailbox_->pop();
-//    message();
+    auto message = mailbox_->pop();
+    message();
     return true;
-
 }
 
 
