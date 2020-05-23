@@ -4,7 +4,6 @@
 #include "testactor.h"
 #include <actormanager.h>
 
-// add necessary includes here
 
 class actortest : public QObject
 {
@@ -18,6 +17,22 @@ private slots:
     void initTestCase();
     void cleanupTestCase();
     void slotIsCalledWhenMessageIsSend();
+    /* TODO:                                            CREAR CLASES TESTEO POR CLASES A TESTEAR
+    void senderIsNullWhenNoMessage();
+    void senderIsSetWhenMessageArrives();
+    void slotCanReplyToSenderActor();
+
+    //Actor::unknownMessage(c const QString& message);
+    void slotIsCalledWhenUnkownMessage();
+
+    Actor::kill(); ActorManager::kill(Actor* actor);
+    void actorKillItSelfWhenIsRequest();
+
+    void actorIsNotifiedWhenChildFailds();
+
+    OPCIONAL --> Testing del ActorManager
+    */
+
 
 private:
     TestActor* actorA_;
@@ -51,6 +66,7 @@ void actortest::slotIsCalledWhenMessageIsSend()
 {
     int arg = 10;
     QVERIFY(actorA_->testSend(actorB_, "updateIntProperty", arg));
+    QTest::qWait(100); //hay que tener siempre en cuenta el tiempo porque son hilos y estan vivos
     QVERIFY(actorB_->property("intProperty").canConvert<int>());
     QCOMPARE(actorB_->property("intProperty").toInt(), arg);
 }
