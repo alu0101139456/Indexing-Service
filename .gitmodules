@@ -1,3 +1,6 @@
 [submodule "libs/QGumboParser"]
 	path = libs/QGumboParser
 	url = git@github.com:lagner/QGumboParser.git
+[submodule "libs/gumbo-query"]
+	path = libs/gumbo-query
+	url = git@github.com:lazytiger/gumbo-query.git

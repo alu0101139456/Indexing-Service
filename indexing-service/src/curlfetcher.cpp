@@ -31,7 +31,7 @@ std::optional<CurlFetcher::FetchInfo>  CurlFetcher::fetchUrl(const std::string &
     curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, &info);
 
     auto result = curl_easy_perform(curl_handle);
-    if( result != CURLE_OK || result != CURLE_WRITE_ERROR ) {
+    if( result != CURLE_OK ) {
         return {};
     }
         // TODO: Manejar error
