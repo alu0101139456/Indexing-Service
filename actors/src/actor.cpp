@@ -70,8 +70,10 @@ bool Actor::reply(const QString& message, const QVariant& arg0,
 
 bool Actor::processMessage()
 {
-    auto message = mailbox_->pop();
-    message();
+    auto message = mailbox_->pop(std::chrono::milliseconds(100));
+    if(!done_ && message) {
+        std::invoke(message.value());
+    }
     return !done_;
 }
 

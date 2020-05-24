@@ -60,12 +60,12 @@ void actortest::initTestCase()
 
 void actortest::cleanupTestCase()
 {
-    QPointer<TestActor> p = actorA_;
+//    QPointer<TestActor> p = actorA_;
 
-    ActorManager::instance()->kill(actorA_);
-    ActorManager::instance()->kill(actorB_);
+    ActorManager::kill(actorA_);
+    ActorManager::kill(actorB_);
 
-    while(!p.isNull());
+//    while(!p.isNull());
 }
 
 void actortest::slotIsCalledWhenMessageIsSend()
@@ -89,7 +89,8 @@ void actortest::actorIsNotifiedWhenChildFails()
 {
     auto child = actorA_->spawnChildAndFail();
     auto cleanup = qScopeGuard([child]() {
-        ActorManager::instance()->kill(child);
+//        ActorManager::instance()->kill(child);
+        ActorManager::kill(child);
     });
     // Comprobar si actorA_ recibio el mensaje de fail del hijo
 

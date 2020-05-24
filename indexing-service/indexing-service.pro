@@ -15,7 +15,11 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        main.cpp
+        src/crawlserver.cpp \
+        src/curlfetcher.cpp \
+        src/httpgetter.cpp \
+        src/linkchecker.cpp \
+        src/main.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -27,4 +31,13 @@ else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../actors/debug/ -l
 else:unix: LIBS += -L$$OUT_PWD/../actors/ -lactors
 
 INCLUDEPATH += $$PWD/../actors/include
-DEPENDPATH += $$PWD/../actors
+DEPENDPATH += $$PWD/../actors/include
+
+HEADERS += \
+  src/crawlserver.h \
+  src/curlfetcher.h \
+  src/httpgetter.h \
+  src/linkchecker.h
+
+unix: CONFIG += link_pkgconfig
+unix: PKGCONFIG += libcurl

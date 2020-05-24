@@ -2,6 +2,7 @@
 #define MAILBOX_H
 
 #include <queue>
+#include <optional>
 #include <mutex>
 #include <condition_variable>
 
@@ -22,7 +23,7 @@ public:
 
     void push (const Message& msg);
     void push (Message&& msg);
-    Message pop();
+    std::optional<Message> pop( const std::chrono::milliseconds& rel_time);
 
     void clear();
 
@@ -47,15 +48,18 @@ void MailBox<Message>::push(Message &&msg)
 }
 
 template<typename Message>
-Message MailBox<Message>::pop()
+std::optional<Message> MailBox<Message>::pop(const std::chrono::milliseconds& rel_time)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    while (mailbox_.empty()) {
-        mailboxNoEmpty_.wait(lock);
+    bool noEmpty = mailboxNoEmpty_.wait_for(lock, rel_time, [this] {
+        return !mailbox_.empty();
+    });
+    if(noEmpty) {
+        auto message = std::move(mailbox_.front());
+        mailbox_.pop();
+        return message;
     }
-    auto message = std::move(mailbox_.front());
-    mailbox_.pop();
-    return message;
+    return {};
 }
 
 template<typename Message>

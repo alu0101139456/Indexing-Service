@@ -1,5 +1,6 @@
 #include <actor.h>
-#include <actormanager.h>
+#include "actorthread.h"
+#include "actormanager.h"
 
 ActorManager* ActorManager::instance_ = nullptr;
 
@@ -32,6 +33,7 @@ ActorManager *ActorManager::instance()
 void ActorManager::kill(Actor *actor)
 {
     actor->done_ = true;
+    actor->thread_->wait();
 }
 
 bool ActorManager::send(Actor *receiver, const QString &message, const QVariant &arg0,
