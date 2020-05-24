@@ -20,6 +20,8 @@ void HttpGetter::request(const QUrl &url, int depth)
 
     auto info = fectcher.fetchUrl(url.toString().toStdString());
 
+//    if( !info || info.value().contentType())
+
     // Gumpo-parse
     // QGumpoParaser
 }
