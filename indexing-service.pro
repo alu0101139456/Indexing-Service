@@ -2,7 +2,7 @@ TEMPLATE = subdirs
 
 SUBDIRS += \
   actors \
-  httpfetchplugin \
+  httpschemaplugin \
   indexing-service \
   test \
   libs/QGumboParser

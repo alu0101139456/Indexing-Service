@@ -1,4 +1,5 @@
 QT -= gui
+QT += remoteobjects
 
 CONFIG += c++17 console
 CONFIG -= app_bundle
@@ -15,11 +16,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+        src/dynamiclibrary.cpp \
         src/crawlserver.cpp \
-        src/curlfetcher.cpp \
         src/httpgetter.cpp \
+        src/indexingservice.cpp \
         src/linkchecker.cpp \
-        src/main.cpp
+        src/main.cpp \
+        src/schemapluginmanager.cpp
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -33,29 +36,31 @@ else:unix: LIBS += -L$$OUT_PWD/../actors/ -lactors
 INCLUDEPATH += $$PWD/../actors/include
 DEPENDPATH += $$PWD/../actors/include
 
+INCLUDEPATH += $$PWD/include
+
 HEADERS += \
+  src/dynamiclibrary.h \
+  include/schemaplugin.h \
   src/crawlserver.h \
-  src/curlfetcher.h \
   src/httpgetter.h \
-  src/linkchecker.h
+  src/indexingservice.h \
+  src/linkchecker.h \
+  src/schemapluginmanager.h
 
-unix: CONFIG += link_pkgconfig
-unix: PKGCONFIG += libcurl
+REPC_SOURCE = src/indexing-service.rep
 
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libs/QGumboParser/QGumboParser/release/ -lQGumboParser
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libs/QGumboParser/QGumboParser/debug/ -lQGumboParser
+else:unix: LIBS += -L$$OUT_PWD/../libs/QGumboParser/QGumboParser/ -lQGumboParser
 
+INCLUDEPATH += $$PWD/../libs/QGumboParser/QGumboParser
+DEPENDPATH += $$PWD/../libs/QGumboParser/QGumboParser
 
-#win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libs/QGumboParser/QGumboParser/release/ -lQGumboParser
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libs/QGumboParser/QGumboParser/debug/ -lQGumboParser
-#else:unix: LIBS += -L$$OUT_PWD/../libs/QGumboParser/QGumboParser/ -lQGumboParser
-
-#INCLUDEPATH += $$PWD/../libs/QGumboParser/QGumboParser
-#DEPENDPATH += $$PWD/../libs/QGumboParser/QGumboParser
-
-#win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/release/libQGumboParser.a
-#else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/debug/libQGumboParser.a
-#else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/release/QGumboParser.lib
-#else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/debug/QGumboParser.lib
-#else:unix: PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/libQGumboParser.a
+win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/release/libQGumboParser.a
+else:win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/debug/libQGumboParser.a
+else:win32:!win32-g++:CONFIG(release, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/release/QGumboParser.lib
+else:win32:!win32-g++:CONFIG(debug, debug|release): PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/debug/QGumboParser.lib
+else:unix: PRE_TARGETDEPS += $$OUT_PWD/../libs/QGumboParser/QGumboParser/libQGumboParser.a
 
 unix:!macx: LIBS += -L$$PWD/../libs/gumbo-query/lib/ -lgq
 
@@ -65,3 +70,6 @@ DEPENDPATH += $$PWD/../libs/gumbo-query/src
 unix:!macx: PRE_TARGETDEPS += $$PWD/../libs/gumbo-query/lib/libgq.a
 
 unix: LIBS += -ldl
+
+DISTFILES += \
+    src/indexing-service.rep

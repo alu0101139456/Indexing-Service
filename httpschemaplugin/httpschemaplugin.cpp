@@ -1,25 +1,24 @@
 #include <curl/curl.h>
-#include "curlfetcher.h"
-#include <optional>
 
-std::atomic_int CurlFetcher::instanceCounter_ = 0;
+#include "httpschemaplugin.h"
 
-CurlFetcher::CurlFetcher()
+std::atomic_int HttpSchemaPlugin::instanceCounter_ = 0;
+
+HttpSchemaPlugin::HttpSchemaPlugin()
 {
     if(instanceCounter_.fetch_add(1, std::memory_order_acquire) == 0) {
         curl_global_init(CURL_GLOBAL_ALL);
     }
 }
 
-CurlFetcher::~CurlFetcher()
+HttpSchemaPlugin::~HttpSchemaPlugin()
 {
     if(instanceCounter_.fetch_sub(1, std::memory_order_acquire) == 1) {
         curl_global_cleanup();
     }
 }
 
-std::optional<CurlFetcher::FetchInfo>  CurlFetcher::fetchUrl(const std::string &url)
-{
+std::optional<SchemaPlugin::FetchInfo> HttpSchemaPlugin::fetchUrl(const std::string &url) {
     FetchInfo info;
     CURL* curl_handle = curl_easy_init();
 
@@ -45,11 +44,23 @@ std::optional<CurlFetcher::FetchInfo>  CurlFetcher::fetchUrl(const std::string &
     return info;
 }
 
-size_t CurlFetcher::curlWriteCallback(char *ptr, size_t, size_t nmemb, void *userdata)
+std::vector<std::string> HttpSchemaPlugin::schemaSupported() {
+    static std::vector<std::string> schemas = {
+        "http",
+        "https"
+    };
+    return schemas;
+}
+
+size_t HttpSchemaPlugin::curlWriteCallback(char *ptr, size_t, size_t nmemb, void *userdata)
 {
     auto info = static_cast<FetchInfo*>(userdata);
     if(nmemb != 0) {
         info->content.insert(info->content.end(), ptr, ptr + nmemb);
     }
     return nmemb;
+}
+
+SchemaPlugin* loadPlugin() {
+    return new HttpSchemaPlugin;
 }

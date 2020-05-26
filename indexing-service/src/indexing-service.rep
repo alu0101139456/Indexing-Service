@@ -1,0 +1,5 @@
+class IndexingService
+{
+    SLOT(void request(const QUrl& url, int depth));
+
+};
