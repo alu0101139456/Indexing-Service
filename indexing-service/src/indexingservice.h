@@ -1,7 +1,7 @@
 #ifndef INDEXINGSERVICE_H
 #define INDEXINGSERVICE_H
 
-#include <rep_indexing-service_source.h>
+#include <rep_indexingservice_source.h>
 #include "httpgetter.h"
 
 class IndexingService : public IndexingServiceSimpleSource
@@ -12,6 +12,9 @@ public:
     IndexingService();
 
     virtual void request (const QUrl& url, int depth) override;
+
+public Q_SLOTS:
+    void results(const QUrl &url, int depth);
 
 private:
     HttpGetter* getter_;

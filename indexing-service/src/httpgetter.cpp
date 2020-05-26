@@ -43,12 +43,16 @@ void HttpGetter::request(const QUrl &url, int depth)
         auto hrefAttribute = node.attribute("href");
         auto srcAttribute = node.attribute("stc");
         if( !hrefAttribute.empty()) {
-            reply("checkUrl", url.resolved(QString::fromStdString(hrefAttribute)), depth);
-            qDebug() << "HttpGetter: URL encontrada " << url.resolved(QString::fromStdString(hrefAttribute));
+            auto urlFound = url.resolved(QString::fromStdString(hrefAttribute));
+            reply("checkUrl", urlFound, depth);
+//            qDebug() << "HttpGetter: URL encontrada " << url.resolved(QString::fromStdString(hrefAttribute));
+            Q_EMIT checkUrl(urlFound, depth);
         }
         if( !srcAttribute.empty()) {
-            reply("checkUrl", url.resolved(QString::fromStdString(srcAttribute)), depth);
-            qDebug() << "HttpGetter: URL encontrada " << url.resolved(QString::fromStdString(srcAttribute));
+            auto urlFound = url.resolved(QString::fromStdString(srcAttribute));
+            reply("checkUrl", urlFound, depth);
+//            qDebug() << "HttpGetter: URL encontrada " << url.resolved(QString::fromStdString(srcAttribute));
+            Q_EMIT checkUrl(urlFound, depth);
         }
 
     }

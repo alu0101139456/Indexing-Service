@@ -47,7 +47,7 @@ HEADERS += \
   src/linkchecker.h \
   src/schemapluginmanager.h
 
-REPC_SOURCE = src/indexing-service.rep
+REPC_SOURCE = src/indexingservice.rep
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../libs/QGumboParser/QGumboParser/release/ -lQGumboParser
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../libs/QGumboParser/QGumboParser/debug/ -lQGumboParser
@@ -72,4 +72,4 @@ unix:!macx: PRE_TARGETDEPS += $$PWD/../libs/gumbo-query/lib/libgq.a
 unix: LIBS += -ldl
 
 DISTFILES += \
-    src/indexing-service.rep
+    src/indexingservice.rep

@@ -13,6 +13,8 @@ public:
 public Q_SLOTS:
     void request(const QUrl& url, int depth); //Desde el Linkcheker
 
+Q_SIGNALS:
+    void checkUrl (const QUrl& url, int depth);
 
 };
 
