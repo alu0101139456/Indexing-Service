@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Indexing-Service
 
 LISTO PARA TRABAJAR
